@@ -1,163 +1,116 @@
-let currentNum = "";
-let previousNum = "";
-let operator = "";
+// Calculator Project
 
-const currentDisplayNumber = document.querySelector(".currentNumber");
-const previousDisplayNumber = document.querySelector(".previousNumber");
+// Variable to store the result display element
+const result = document.querySelector(".result");
 
-window.addEventListener("keydown", handleKeyPress);
+// Variable to store the equal button element
+const equal = document.querySelector(".btn-equal");
 
-const equal = document.querySelector(".equal");
+// Calculator object
+const calculator = {
+  // Array to store inputs: exp[0] for the first operand, exp[1] for the operator, and exp[2] for the second operand
+  exp: ["", "", ""],
+
+  // Method to perform addition
+  add: (a, b) => {
+    return a + b;
+  },
+
+  // Method to perform subtraction
+  sub: (a, b) => {
+    return a - b;
+  },
+
+  // Method to perform multiplication
+  mul: (a, b) => {
+    return a * b;
+  },
+
+  // Method to perform division
+  div: (a, b) => {
+    return b !== 0 ? a / b : (result.textContent = "error");
+  },
+
+  // Method to reset the calculator
+  reset: () => {
+    result.textContent = "";
+    calculator.exp = ["", "", ""];
+  },
+};
+
+// Variable to store the clear button element
+const clear = document.getElementById("clear");
+clear.addEventListener("click", calculator.reset);
+
+// Variable to store all number buttons
+const numbers = document.querySelectorAll(".btn-number");
+numbers.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (result.textContent === "error") {
+      calculator.reset();
+    }
+    result.textContent += btn.textContent;
+
+    // Update the appropriate operand in the calculator object's exp array
+    calculator.exp[1] === ""
+      ? (calculator.exp[0] += btn.textContent)
+      : (calculator.exp[2] += btn.textContent);
+
+    enableButtons();
+  });
+});
+
+// Variable to store all operator buttons
+const operators = document.querySelectorAll(".btn-op");
+operators.forEach((opr) => {
+  opr.addEventListener("click", () => {
+    expression2(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
+    calculator.exp[1] = opr.textContent;
+
+    // Display the operator sign in the result
+    result.textContent += opr.textContent;
+
+    disableButtons();
+  });
+});
+
+// Event listener for the equal button
 equal.addEventListener("click", () => {
-  if (currentNum != "" && previousNum != "") {
-    compute();
-  }
+  expression2(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
 });
 
-const decimal = document.querySelector(".decimal");
-decimal.addEventListener("click", () => {
-  addDecimal();
-});
-
-const clear = document.querySelector(".clear");
-clear.addEventListener("click", clearCalculator);
-
-const numberButtons = document.querySelectorAll(".number");
-
-const operators = document.querySelectorAll(".operator");
-
-numberButtons.forEach((btn) => {
-  btn.addEventListener("click", (e) => {
-    handleNumber(e.target.textContent);
-  });
-});
-
-function handleNumber(number) {
-  if (previousNum !== "" && currentNum !== "" && operator === "") {
-    previousNum = "";
-    currentDisplayNumber.textContent = currentNum;
-  }
-  if (currentNum.length <= 11) {
-    currentNum += number;
-    currentDisplayNumber.textContent = currentNum;
-  }
+// Function to disable operator buttons and equal button
+function disableButtons() {
+  operators.forEach((op) => (op.disabled = true));
+  document.querySelector(".btn-equal").disabled = true;
 }
 
-operators.forEach((btn) => {
-  btn.addEventListener("click", (e) => {
-    handleOperator(e.target.textContent);
-  });
-});
-
-function handleOperator(op) {
-  if (previousNum === "") {
-    previousNum = currentNum;
-    operatorCheck(op);
-  } else if (currentNum === "") {
-    operatorCheck(op);
-  } else {
-    compute();
-    operator = op;
-    currentDisplayNumber.textContent = "0";
-    previousDisplayNumber.textContent = previousNum + " " + operator;
-  }
+// Function to enable operator buttons and equal button
+function enableButtons() {
+  operators.forEach((op) => (op.disabled = false));
+  document.querySelector(".btn-equal").disabled = false;
 }
 
-function operatorCheck(text) {
-  operator = text;
-  previousDisplayNumber.textContent = previousNum + " " + operator;
-  currentDisplayNumber.textContent = "0";
-  currentNum = "";
-}
-
-function compute() {
-  previousNum = Number(previousNum);
-  currentNum = Number(currentNum);
-
-  if (operator === "+") {
-    previousNum += currentNum;
-  } else if (operator === "-") {
-    previousNum -= currentNum;
-  } else if (operator === "x") {
-    previousNum *= currentNum;
-  } else if (operator === "/") {
-    if (currentNum <= 0) {
-      previousNum = "Error";
-      displayResults();
-      return;
+// Function to evaluate the expression and update the result
+function expression2(a, operator, b) {
+  if (b !== "") {
+    switch (operator) {
+      case "+":
+        a = calculator.add(parseInt(a), parseInt(b));
+        break;
+      case "-":
+        a = calculator.sub(parseInt(a), parseInt(b));
+        break;
+      case "*":
+        a = calculator.mul(parseInt(a), parseInt(b));
+        break;
+      case "/":
+        a = calculator.div(parseInt(a), parseInt(b));
+        break;
     }
-    previousNum /= currentNum;
-  }
-  previousNum = roundNumber(previousNum);
-  previousNum = previousNum.toString();
-  displayResults();
-}
-
-function roundNumber(num) {
-  return Math.round(num * 100000) / 100000;
-}
-
-function displayResults() {
-  if (previousNum.length <= 11) {
-    currentDisplayNumber.textContent = previousNum;
+    result.textContent = a;
+    calculator.exp = [a.toString(), "", ""];
   } else {
-    currentDisplayNumber.textContent = previousNum.slice(0, 11) + "...";
-  }
-  previousDisplayNumber.textContent = "";
-  operator = "";
-  currentNum = "";
-}
-
-function clearCalculator() {
-  currentNum = "";
-  previousNum = "";
-  operator = "";
-  currentDisplayNumber.textContent = "0";
-  previousDisplayNumber.textContent = "";
-}
-
-function addDecimal() {
-  if (!currentNum.includes(".")) {
-    currentNum += ".";
-    currentDisplayNumber.textContent = currentNum;
-  }
-}
-
-function handleKeyPress(e) {
-  e.preventDefault();
-  if (e.key >= 0 && e.key <= 9) {
-    handleNumber(e.key);
-  }
-  if (
-    e.key === "Enter" ||
-    (e.key === "=" && currentNum != "" && previousNum != "")
-  ) {
-    compute();
-  }
-  if (e.key === "+" || e.key === "-" || e.key === "/") {
-    handleOperator(e.key);
-  }
-  if (e.key === "*") {
-    handleOperator("x");
-  }
-  if (e.key === ".") {
-    addDecimal();
-  }
-  if (e.key === "Backspace") {
-    handleDelete();
-  }
-}
-
-function handleDelete() {
-  if (currentNum !== "") {
-    currentNum = currentNum.slice(0, -1);
-    currentDisplayNumber.textContent = currentNum;
-    if (currentNum === "") {
-      currentDisplayNumber.textContent = "0";
-    }
-  }
-  if (currentNum === "" && previousNum !== "" && operator === "") {
-    previousNum = previousNum.slice(0, -1);
-    currentDisplayNumber.textContent = previousNum;
+    result.textContent = a + " " + operator;
   }
 }
