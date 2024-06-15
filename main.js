@@ -4,13 +4,12 @@ const result = document.querySelector(".result");
 // Variable to store the equal button element
 const equal = document.querySelector(".btn-equal");
 
-// Flag to track if a result has been displayed
-let resultDisplayed = false;
-
 // Calculator object to store the expression and perform calculations
 const calculator = {
   // Array to store inputs: [operand1, operator, operand2]
   exp: ["", "", ""],
+  // Flag to track if a result has been displayed
+  resultDisplayed: false,
 
   // Method to perform addition
   add: (a, b) => {
@@ -36,7 +35,7 @@ const calculator = {
   reset: () => {
     result.textContent = "";
     calculator.exp = ["", "", ""];
-    resultDisplayed = false;
+    calculator.resultDisplayed = false;
     enableButtons("fraction");
   },
 };
@@ -52,10 +51,10 @@ numbers.forEach((btn) => {
     if (result.textContent === "error") {
       calculator.reset();
     }
-    if (resultDisplayed) {
+    if (calculator.resultDisplayed) {
       result.textContent = "";
       calculator.exp = ["", "", ""];
-      resultDisplayed = false;
+      calculator.resultDisplayed = false;
       enableButtons("fraction");
     }
 
@@ -78,7 +77,7 @@ operators.forEach((opr) => {
     enableButtons("fraction");
 
     // Evaluate the expression so far and update the result display
-    expression2(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
+    expression(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
 
     // Update the operator in the calculator object's expression array
     calculator.exp[1] = opr.textContent;
@@ -91,8 +90,8 @@ operators.forEach((opr) => {
 // Event listener for the equal button
 equal.addEventListener("click", () => {
   // Evaluate the complete expression and update the result display
-  expression2(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
-  resultDisplayed = true;
+  expression(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
+  calculator.resultDisplayed = true;
 });
 
 // Variable to store the fraction button element
@@ -116,10 +115,14 @@ btnDelete.addEventListener("click", () => {
   result.textContent = deleteNum(result.textContent);
   if (calculator.exp[1] === "") {
     calculator.exp[0] = deleteNum(calculator.exp[0]);
-    if (!calculator.exp[0].includes(".")) enableButtons("fraction");
-    } else {
+    if (!calculator.exp[0].includes(".")) {
+      enableButtons("fraction");
+    }
+  } else {
     calculator.exp[2] = deleteNum(calculator.exp[2]);
-    if (!calculator.exp[2].includes(".")) enableButtons("fraction");
+    if (!calculator.exp[2].includes(".")) {
+      enableButtons("fraction");
+    }
   }
 });
 
@@ -149,7 +152,7 @@ function enableButtons(type) {
 }
 
 // Function to evaluate the expression and update the result
-function expression2(a, operator, b) {
+function expression(a, operator, b) {
   if (b !== "") {
     // Convert operands to appropriate number types
     if (a.includes(".") || b.includes(".")) {
@@ -189,7 +192,7 @@ function expression2(a, operator, b) {
 
     // Update the calculator object's expression with the new result as the first operand
     calculator.exp = [a.toString(), "", ""];
-    resultDisplayed = true;
+    calculator.resultDisplayed = true;
   } else {
     result.textContent = a + " " + operator;
   }
