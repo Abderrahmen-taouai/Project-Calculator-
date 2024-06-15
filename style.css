@@ -2,7 +2,9 @@
     margin: 0;
     padding: 0;
   }
-  
+  body{
+    background-color: #2c3e50;
+  }
   .container {
     margin-top: 3rem;
     display: flex;
@@ -12,8 +14,9 @@
   }
   
   .display {
-    width: 50%;
-    min-height: 10%;
+    min-height: 4rem;
+    width: 40%;
+    
     background-color: #f0f0f0;
     border-radius: 5px;
     display: flex;
@@ -23,7 +26,9 @@
   }
   
   .result {
-    font-size: 24px;
+   
+    box-sizing: border-box;
+    font-size: 2rem;
     text-align: right;
   }
   
@@ -49,23 +54,55 @@
     border-radius: 5px;
     cursor: pointer;
     color: white;
+    text-align: center;
   }
   
   .btn-number {
     color: white;
   }
   
-  .btn-op {
+  .btn-op,.btn-opa {
     background-color: teal; 
     color: white;
   }
   
-  .btn-equal {
+  .btn-equal,.btn-opa[data-id="fraction"]  {
     background-color: #7C4DFF; 
     color: white;
+    
   }
   
   .btn-clear {
     background-color: coral;
     color: white;
+  }
+  .btn-clear,.btn-opa[data-id="delete"]  {
+    flex-grow: 1;
+  }
+  .btn-number:hover,
+  .btn-clear:hover
+  {
+    background: white;
+    color:  coral;
+    border: solid 1px coral;
+    border-radius: 5px;
+    font-size: 32px;
+  }
+  
+  
+  .btn-opa[data-id="fraction"]:hover,
+  .btn-equal:hover {
+    background: white;
+    color: #7C4DFF;
+    border: solid 1px #7C4DFF;
+    border-radius: 5px;
+    font-size: 32px;
+  }
+  .btn-opa[data-id="delete"]:hover,
+  .btn-op:hover{
+    background: white;
+    color:  teal;
+    border: solid 1px  teal;
+    border-radius: 5px;
+    font-size: 32px;
   }
