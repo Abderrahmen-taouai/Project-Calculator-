@@ -4,6 +4,9 @@ const result = document.querySelector(".result");
 // Variable to store the equal button element
 const equal = document.querySelector(".btn-equal");
 
+// Flag to track if a result has been displayed
+let resultDisplayed = false;
+
 // Calculator object to store the expression and perform calculations
 const calculator = {
   // Array to store inputs: [operand1, operator, operand2]
@@ -33,6 +36,8 @@ const calculator = {
   reset: () => {
     result.textContent = "";
     calculator.exp = ["", "", ""];
+    resultDisplayed = false;
+    enableButtons("fraction");
   },
 };
 
@@ -46,6 +51,12 @@ numbers.forEach((btn) => {
   btn.addEventListener("click", () => {
     if (result.textContent === "error") {
       calculator.reset();
+    }
+    if (resultDisplayed) {
+      result.textContent = "";
+      calculator.exp = ["", "", ""];
+      resultDisplayed = false;
+      enableButtons("fraction");
     }
 
     // Update the appropriate operand in the calculator object's expression array
@@ -81,6 +92,7 @@ operators.forEach((opr) => {
 equal.addEventListener("click", () => {
   // Evaluate the complete expression and update the result display
   expression2(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
+  resultDisplayed = true;
 });
 
 // Variable to store the fraction button element
@@ -104,8 +116,10 @@ btnDelete.addEventListener("click", () => {
   result.textContent = deleteNum(result.textContent);
   if (calculator.exp[1] === "") {
     calculator.exp[0] = deleteNum(calculator.exp[0]);
-  } else {
+    if (!calculator.exp[0].includes(".")) enableButtons("fraction");
+    } else {
     calculator.exp[2] = deleteNum(calculator.exp[2]);
+    if (!calculator.exp[2].includes(".")) enableButtons("fraction");
   }
 });
 
@@ -147,7 +161,6 @@ function expression2(a, operator, b) {
     }
 
     // Perform the calculation based on the operator
- 
     switch (operator) {
       case "+":
         a = calculator.add(a, b);
@@ -176,6 +189,7 @@ function expression2(a, operator, b) {
 
     // Update the calculator object's expression with the new result as the first operand
     calculator.exp = [a.toString(), "", ""];
+    resultDisplayed = true;
   } else {
     result.textContent = a + " " + operator;
   }
