@@ -147,10 +147,7 @@ function expression2(a, operator, b) {
     }
 
     // Perform the calculation based on the operator
-    switch (operator) {
-Apologies for the incomplete response. Here's the continuation of the modified code with comments added:
-
-```javascript
+ 
     switch (operator) {
       case "+":
         a = calculator.add(a, b);
