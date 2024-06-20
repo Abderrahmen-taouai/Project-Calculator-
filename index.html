@@ -1,43 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
     <script src="main.js" defer></script>
-    <title>Library</title>
-  </head>
-  <body>
+    <title>Calculator</title>
+</head>
+<body>
     <div class="container">
-      <div class="sidebuttons">
-        <button data-dialog-show>Add Book</button>
-        <button class="btn-display">Display Books</button>
-        <button class="btn-rest">Rest</button>
-      </div>
-
-      <div class="display"></div>
-      <dialog data-dialog>
-        This is an open dialog window
-        <div class="form">
-          <form id="myForm" action="" method="post">
-            Title: <input type="text" name="Title" required /><br />
-            Author: <input type="text" name="Author" required /><br />
-            Pages: <input type="text" name="Pages" required /><br />
-            Read:
-            <input type="radio" name="option" value="yes" required /> Yes
-            <input type="radio" name="option" value="no" required /> No<br />
-            <button type="submit">Add</button>
-          </form>
+        <div class="display">
+            <div class="result"></div>
         </div>
-        <button data-dialog-close>close</button>
-      </dialog>
+        <div class="buttons">
+             <div class="row">
+                <button class="btn-number">7</button>
+                <button class="btn-number">8</button>
+                <button class="btn-number">9</button>
+                <button class="btn-op">/</button>
+            </div>   
+            <div class="row">
+                <button class="btn-number">4</button>
+                <button class="btn-number">5</button>
+                <button class="btn-number">6</button>
+                <button class="btn-op">*</button>
+            </div>
+            <div class="row">
+                <button class="btn-number">1</button>
+                <button class="btn-number">2</button>
+                <button class="btn-number">3</button>
+                <button class="btn-op">-</button>
+            </div>
+         
+           
+            <div class="row">
+                <button class="btn-number">0</button>
+                <button class="btn-opa" data-id="fraction" >.</button>
+                <button class="btn-equal">=</button>
+                <button class="btn-op">+</button>
+            </div>
+            <div class="row">
+            </div>
+            <div class="row">
+                <button class="btn-clear" id="clear">C</button>
+                <button class="btn-opa" data-id="delete" >Del</button>
+
+            </div>
+        </div>
     </div>
     <footer>
-      by Abderrahmen Taouai
-      <a href="https://github.com/Abderrahmen-taouai/Project-Calculator-">
-        <br />
-        GitHub
-      </a>
+        Abderrahmen Taouai
+        <a href="https://github.com/Abderrahmen-taouai/Project-Calculator-"> <br>  GitHub </a>
     </footer>
-  </body>
+   
+</body>
 </html>
