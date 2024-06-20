@@ -1,159 +1,210 @@
-// Variable Declarations
-const display = document.querySelector(".display"); // Container for displaying books
-const dialogShow = document.querySelector("[data-dialog-show]"); // Button to show dialog
-const dialogClose = document.querySelector("[data-dialog-close]"); // Button to close dialog
-const dialog = document.querySelector("[data-dialog]"); // Dialog element
-const myForm = document.getElementById("myForm"); // Form element
-const submit = document.querySelector('button[type="submit"]'); // Submit button
-const reset = document.querySelector(".btn-rest"); // Reset button
-const displaybook = document.querySelector(".btn-display"); // Display books button
-let myLibrary = []; // Array to store books in the library
+// Variable to store the result display element
+const result = document.querySelector(".result");
 
-// Event Listener for Reset Button
-reset.addEventListener("click", () => {
-  myLibrary = []; // Clear the library array
-  display.innerHTML = ""; // Clear the display container
+// Variable to store the equal button element
+const equal = document.querySelector(".btn-equal");
+
+// Calculator object to store the expression and perform calculations
+const calculator = {
+  // Array to store inputs: [operand1, operator, operand2]
+  exp: ["", "", ""],
+  // Flag to track if a result has been displayed
+  resultDisplayed: false,
+
+  // Method to perform addition
+  add: (a, b) => {
+    return a + b;
+  },
+
+  // Method to perform subtraction
+  sub: (a, b) => {
+    return a - b;
+  },
+
+  // Method to perform multiplication
+  mul: (a, b) => {
+    return a * b;
+  },
+
+  // Method to perform division
+  div: (a, b) => {
+    return b !== 0 ? a / b : (result.textContent = "error");
+  },
+
+  // Method to reset the calculator
+  reset: () => {
+    result.textContent = "";
+    calculator.exp = ["", "", ""];
+    calculator.resultDisplayed = false;
+    enableButtons("fraction");
+  },
+};
+
+// Variable to store the clear button element
+const clear = document.getElementById("clear");
+clear.addEventListener("click", calculator.reset);
+
+// Variable to store all number buttons
+const numbers = document.querySelectorAll(".btn-number");
+numbers.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (result.textContent === "error") {
+      calculator.reset();
+    }
+    if (calculator.resultDisplayed) {
+      result.textContent = "";
+      calculator.exp = ["", "", ""];
+      calculator.resultDisplayed = false;
+      enableButtons("fraction");
+    }
+
+    // Update the appropriate operand in the calculator object's expression array
+    calculator.exp[1] === ""
+      ? (calculator.exp[0] += btn.textContent)
+      : (calculator.exp[2] += btn.textContent);
+
+    // Update the result display
+    result.textContent += btn.textContent;
+    enableButtons("");
+  });
 });
 
-// Function to Validate Form Input
-function validateForm(event) {
-  // Get form input values
-  const titleInput = document.querySelector('input[name="Title"]').value;
-  const authorInput = document.querySelector('input[name="Author"]').value;
-  const pagesInput = document.querySelector('input[name="Pages"]').value;
-  const readInput = document.querySelector(
-    'input[name="option"]:checked'
-  ).value;
+// Variable to store all operator buttons
+const operators = document.querySelectorAll(".btn-op");
+operators.forEach((opr) => {
+  opr.addEventListener("click", () => {
+    disableButtons("");
+    enableButtons("fraction");
 
-  // Perform validation
-  while (
-    titleInput === "" ||
-    authorInput === "" ||
-    pagesInput === "" ||
-    !readInput
-  ) {
-    alert("Please fill out all required fields.");
-    return;
-  }
+    // Evaluate the expression so far and update the result display
+    expression(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
 
-  // If all fields are filled, create the book
-  let book = `b${myLibrary.length}`;
-  book = new Book(authorInput, titleInput, pagesInput, readInput);
-  addBookToLibrary(book);
-  CreateCard(book);
-  alert("Book added");
-  myForm.reset();
+    // Update the operator in the calculator object's expression array
+    calculator.exp[1] = opr.textContent;
+
+    // Update the result display
+    result.textContent += opr.textContent;
+  });
+});
+
+// Event listener for the equal button
+equal.addEventListener("click", () => {
+  // Evaluate the complete expression and update the result display
+  expression(calculator.exp[0], calculator.exp[1], calculator.exp[2]);
+  calculator.resultDisplayed = true;
+});
+
+// Variable to store the fraction button element
+let btnFraction = document.querySelector('[data-id="fraction"]');
+btnFraction.addEventListener("click", addFraction);
+
+// Function to handle the fraction button click
+function addFraction() {
+  // Update the result display and the appropriate operand in the calculator object's expression array
+  result.textContent += ".";
+  calculator.exp[1] === ""
+    ? (calculator.exp[0] += ".")
+    : (calculator.exp[2] += ".");
+  disableButtons("fraction");
 }
 
-// Event Listener for Submit Button
-submit.addEventListener("click", (event) => {
-  event.preventDefault();
-  validateForm(event);
-});
-
-// Event Listener for Dialog Show Button
-dialogShow.addEventListener("click", () => {
-  dialog.showModal();
-});
-
-// Event Listener for Dialog Close Button
-dialogClose.addEventListener("click", () => {
-  dialog.close();
-});
-
-// Event Listener for Display Books Button
-displaybook.addEventListener("click", () => {
-  if (myLibrary.length > 0) {
-    displayFunc();
+// Variable to store the delete button element
+let btnDelete = document.querySelector('[data-id="delete"]');
+btnDelete.addEventListener("click", () => {
+  // Remove the last character from the result display and the appropriate operand in the calculator object's expression array
+  result.textContent = deleteNum(result.textContent);
+  if (calculator.exp[1] === "") {
+    calculator.exp[0] = deleteNum(calculator.exp[0]);
+    if (!calculator.exp[0].includes(".")) {
+      enableButtons("fraction");
+    }
   } else {
-    alert("No books in the library.");
+    calculator.exp[2] = deleteNum(calculator.exp[2]);
+    if (!calculator.exp[2].includes(".")) {
+      enableButtons("fraction");
+    }
   }
 });
 
-// Book Constructor Function
-function Book(author, title, pages, read) {
-  this.author = author;
-  this.title = title;
-  this.pages = pages;
-  read === "yes" ? (this.read = "✓") : (this.read = "X");
+// Function to delete the last character in a string
+function deleteNum(ele) {
+  return ele.substring(0, ele.length - 1);
 }
 
-// Function to Add Book to Library
-function addBookToLibrary(book) {
-  myLibrary.push(book);
-}
-
-// Function to Display Books
-function displayFunc() {
-  myLibrary.forEach((book) => {
-    let index = myLibrary.indexOf(book);
-
-    // Update book details in the display container
-    let title = document.querySelector(`.list${index}`).childNodes[0];
-    title.innerHTML = `<h3>${book.title}</h3>`;
-    let author = document.querySelector(`.list${index}`).childNodes[1];
-    author.textContent = `Author: ${book.author}`;
-    let pages = document.querySelector(`.list${index}`).childNodes[2];
-    pages.textContent = `Pages: ${book.pages}`;
-    let read = document.querySelector(`.list${index}`).childNodes[3];
-    read.textContent = `Read: ${book.read}`;
-
-    // Event Listener for toggling read status
-    let toggleRead = document.querySelector(`.toggleRead${index}`);
-    toggleRead.addEventListener("click", () => {
-      book.read = book.read === "X" ? "✓" : "X";
-      read.textContent = `Read: ${book.read}`;
-    });
-  });
-
-  display.classList.remove("hidden");
-}
-
-// Function to Create Book Card
-function CreateCard(book) {
-  display.classList.add("hidden");
-  let index = myLibrary.indexOf(book);
-  let card = document.createElement("div");
-
-  card.classList.add(`card${index}`);
-  card.classList.add("card");
-
-  display.appendChild(card);
-  let list = document.createElement("ul");
-  list.classList.add("list");
-  list.classList.add(`list${index}`);
-
-  // Create list items for book details
-  for (let index = 0; index < 4; index++) {
-    let li = document.createElement("li");
-    li.id = `${index}`;
-    li.textContent = `${index}`;
-    list.appendChild(li);
+// Function to disable operator buttons and equal button
+function disableButtons(type) {
+  if (type === "fraction") {
+    document.querySelector('[data-id="fraction"]').disabled = true;
+  } else {
+    operators.forEach((op) => (op.disabled = true));
+    document.querySelector(".btn-equal").disabled = true;
   }
+}
 
-  card.appendChild(list);
+// Function to enable operator buttons and equal button
+function enableButtons(type) {
+  if (type === "fraction") {
+    document.querySelector('[data-id="fraction"]').disabled = false;
+  } else {
+    operators.forEach((op) => (op.disabled = false));
+    document.querySelector(".btn-equal").disabled = false;
+  }
+}
 
-  // Button to delete book
-  let deleteBook = document.createElement("button");
-  deleteBook.classList.add(`deletebook${index}`);
-  deleteBook.textContent = "Remove";
-  deleteBook.style =
-    "background-color: #04AA6D; padding: 14px 28px; font-size: 16px;";
+// Function to evaluate the expression and update the result
+function expression(a, operator, b) {
+  if (b !== "") {
+    // Convert operands to appropriate number types
+    if (a.includes(".") || b.includes(".")) {
+      a = stringToFloat(a);
+      b = stringToFloat(b);
+    } else {
+      a = parseInt(a);
+      b = parseInt(b);
+    }
 
-  // Event Listener for deleting book
-  deleteBook.addEventListener("click", () => {
-    myLibrary.splice(index, 1);
-    card.remove();
-  });
-  card.appendChild(deleteBook);
+    // Perform the calculation based on the operator
+    switch (operator) {
+      case "+":
+        a = calculator.add(a, b);
+        break;
+      case "-":
+        a = calculator.sub(a, b);
+        break;
+      case "*":
+        a = calculator.mul(a, b);
+        break;
+      case "/":
+        a = calculator.div(a, b);
+        break;
+    }
 
-  // Button to toggle reading a book
-  let toggleRead = document.createElement("button");
-  toggleRead.classList.add(`toggleRead${index}`);
-  toggleRead.textContent = "Change read statut?";
+    // Convert the result back to a string and update the result display
+    a = a.toString();
+    if (a.length >= 11) {
+      let s = "";
+      for (let index = 0; index < 11; index++) {
+        s += a[index];
+      }
+      a = parseFloat(s).toFixed(2);
+    }
+    result.textContent = a;
 
-  toggleRead.style =
-    "background-color: #04AA6D; padding: 14px 28px; font-size: 16px;";
+    // Update the calculator object's expression with the new result as the first operand
+    calculator.exp = [a.toString(), "", ""];
+    calculator.resultDisplayed = true;
+  } else {
+    result.textContent = a + " " + operator;
+  }
+}
 
-  card.appendChild(toggleRead);
+// Function to convert a string representation of a fraction to a floating-point number
+function stringToFloat(str) {
+  let fraction = 1;
+
+  while (str.toString().includes(".")) {
+    str = str * 10;
+    fraction /= 10;
+  }
+  return str * fraction;
 }
